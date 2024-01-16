@@ -8,6 +8,8 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
+use App\Models\Micropost;
+
 class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
@@ -50,10 +52,13 @@ class User extends Authenticatable
         return $this->hasMany(Micropost::class);
     }
     
+    /**
+     * このユーザに関係するモデルの件数をロードする。
+     */
     public function loadRelationshipCounts()
     {
-        $this->loadCount('microposts', 'followings', 'followers');
-                                        // 追加'followings',と'followers'
+        $this->loadCount('microposts', 'followings', 'followers','favorites');
+                                // 追加'followings'と'followers'と'favorites'
     }
     
     /**
@@ -131,4 +136,66 @@ class User extends Authenticatable
         return Micropost::whereIn('user_id', $userIds);
     }
     
+    // 以降追加
+    // このユーザーがお気に入り中のポスト
+    public function favorites()
+    {
+        return $this->belongsToMany(Micropost::class, 'favorites', 'user_id', 'micropost_id')->withTimestamps();
+    }
+    
+    /**
+     * $micropostIdで指定されたポストをお気に入りする。
+     *
+     * @param  int  $micropostId
+     * @return bool
+     */
+    
+    //add to favorites table/store
+    public function favorite($micropostId)
+    {
+        $exist = $this->is_liking($micropostId);
+        // $its_me = $this->id == $micropostId;
+        // $this->idがどこのidなのかわからん
+        // ポストidならMicropostのクラスのidに繋げないと判定できないか？
+        
+        // $existがtureならfalseを返して保存されない
+        if ($exist) {
+            return false;
+        } else {
+            $this->favorites()->attach($micropostId);
+            return true;
+        }
+    }
+    
+    /**
+     * $micropostIdで指定されたポストをお気に入りから削除する
+     *
+     * @param  int  $micropostId
+     * @return bool
+     */
+     
+    //remove from favorites table/destroy
+    public function unfavorite($micropostId)
+    {
+        $exist = $this->is_liking($micropostId);
+        
+        if ($exist) {
+            $this->favorites()->detach($micropostId);
+            return true;
+        } else {
+            return false;
+        }
+    }
+    
+    /**
+     * 指定された$micropostIdのポストをこのユーザがお気に入り中か調べる。お気に入り中ならtrueを返す。
+     * 
+     * @param  int $micropostId
+     * @return bool
+     */
+    // favorites_tableにある'micropost_id'と指定された$micropostIdが一致しているかを判定？
+    public function is_liking($micropostId)
+    {
+        return $this->favorites()->where('micropost_id', $micropostId)->exists();
+    }
 }
