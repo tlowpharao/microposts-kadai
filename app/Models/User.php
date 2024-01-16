@@ -60,6 +60,7 @@ class User extends Authenticatable
         $this->loadCount('microposts', 'followings', 'followers','favorites');
                                 // 追加'followings'と'followers'と'favorites'
     }
+
     
     /**
      * このユーザがフォロー中のユーザ。（Userモデルとの関係を定義）
@@ -75,6 +76,15 @@ class User extends Authenticatable
     public function followers()
     {
         return $this->belongsToMany(User::class, 'user_follow', 'follow_id', 'user_id')->withTimestamps();
+    }
+    
+    /**
+     * このユーザーがお気に入り中のポスト(Micropostモデル?との関係を定義）
+     */
+    // このユーザーがお気に入り中のポスト Micropost::classなのか
+    public function favorites()
+    {
+        return $this->belongsToMany(Micropost::class, 'favorites', 'user_id', 'micropost_id')->withTimestamps();
     }
     
     /**
@@ -126,6 +136,7 @@ class User extends Authenticatable
         return $this->followings()->where('follow_id', $userId)->exists();
     }
     
+    
     public function feed_microposts()
     {
         // このユーザがフォロー中のユーザのidを取得して配列にする
@@ -137,12 +148,6 @@ class User extends Authenticatable
     }
     
     // 以降追加
-    // このユーザーがお気に入り中のポスト
-    public function favorites()
-    {
-        return $this->belongsToMany(Micropost::class, 'favorites', 'user_id', 'micropost_id')->withTimestamps();
-    }
-    
     /**
      * $micropostIdで指定されたポストをお気に入りする。
      *

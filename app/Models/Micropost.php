@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\Use;
+use App\Models\User;
 
 class Micropost extends Model
 {
@@ -22,7 +22,7 @@ class Micropost extends Model
     // このポストがお気に入り'されてる'ユーザーの数
     public function favorite_users()
     {
-        return $this->belongsToMany(Micropost::class, 'favorites', 'micropost_id', 'user_id')->withTimestamps();
+        return $this->belongsToMany(User::class, 'favorites', 'micropost_id', 'user_id')->withTimestamps();
     }
     
     
