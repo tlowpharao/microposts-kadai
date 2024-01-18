@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;                        // 追加
 use App\Models\User;
+use App\Models\Micropost;
+
 
 class UsersController extends Controller
 {
@@ -93,9 +95,8 @@ class UsersController extends Controller
         $favorites = $user->favorites()->paginate(3);
 
         // フォロー一覧ビューでそれらを表示
-        // タブに表示する取得した件数を'users.favorites'ビューに'favorite'変数として返す
         return view('users.favorites', [
-            'favorite' => $user,
+            'user' => $user,
             'favorites' => $favorites,
         ]);
     }

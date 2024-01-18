@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Micropost;
 
-class FavoriteController extends Controller
+class FavoritesController extends Controller
 {
     //
     public function store($id)

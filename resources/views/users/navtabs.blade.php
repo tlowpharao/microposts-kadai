@@ -20,3 +20,4 @@
         <div class="badge ml-1">{{ $user->favorites_count }}</div>
     </a>
 </div>
+
